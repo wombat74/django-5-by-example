@@ -33,3 +33,18 @@ class Post(models.Model):
     
     def __str__(self):
         return self.title
+    
+class FavouritePost(models.Model):
+    pk = models.CompositePrimaryKey(
+        'user',
+        'post',
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    post = models.ForeignKey(
+        'blog.Post',
+        on_delete=models.CASCADE
+    )
+    created = models.DateTimeField(auto_now_add=True)
