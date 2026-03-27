@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+
 class PublishedManager(models.Manager):
     def get_queryset(self):
         return(
@@ -30,6 +31,7 @@ class Post(models.Model):
 
     objects = models.Manager() # The default manager
     published = PublishedManager() # Our custom manager
+    
     class Meta:
         # ordering
         ordering = ('-publish',)
