@@ -3,7 +3,7 @@ from django.http import Http404
 from .models import Post
 
 def post_list(request):
-    posts = Post.publish.all()
+    posts = Post.published.all()
 
     context = {
         'posts':posts,
@@ -11,7 +11,7 @@ def post_list(request):
 
     return render(request, 'blog/post/list.html', context)
 
-def post_detail(request):
+def post_detail(request, id):
     post = get_object_or_404(
         Post,
         id=id,
