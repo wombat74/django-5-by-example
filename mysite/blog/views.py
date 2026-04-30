@@ -3,7 +3,32 @@ from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import Http404
 from .models import Post
+from .forms import EmailPostForm
 
+def post_share(request, post_id):
+    # retrieve post by id
+    post = get_object_or_404(
+        Post,
+        id=post_id,
+        status=Post.Status.PUBLISHED
+    )
+    
+    if request.method == 'POST':
+        # form was submitted
+        form = EmailPostForm(request.POST)
+        if form.is_valid():
+            # form fields passed validation
+            cd = form.cleaned_data
+            # .. send email
+        else:
+            form = EmailPostForm()
+
+        context = {
+            'post': post,
+            'form': form
+        }
+
+        return render(request, 'blog/post/share.html', context)
 class PostListView(ListView):
     ''' alternative post list view '''
     queryset = Post.published.all()
