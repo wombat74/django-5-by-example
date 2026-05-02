@@ -16,12 +16,13 @@ def post_share(request, post_id):
     if request.method == 'POST':
         # form was submitted
         form = EmailPostForm(request.POST)
-        
+
         if form.is_valid():
             # form fields passed validation
             cd = form.cleaned_data
             # .. send email
         else:
+            print(f"Form Errors: {form.errors}")
             form = EmailPostForm()
 
         context = {
