@@ -12,10 +12,11 @@ def post_share(request, post_id):
         id=post_id,
         status=Post.Status.PUBLISHED
     )
-    
+
     if request.method == 'POST':
         # form was submitted
         form = EmailPostForm(request.POST)
+        
         if form.is_valid():
             # form fields passed validation
             cd = form.cleaned_data
@@ -29,6 +30,7 @@ def post_share(request, post_id):
         }
 
         return render(request, 'blog/post/share.html', context)
+    
 class PostListView(ListView):
     ''' alternative post list view '''
     queryset = Post.published.all()
