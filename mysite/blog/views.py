@@ -4,6 +4,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import Http404
 from .models import Post
 from .forms import EmailPostForm
+from django.core.mail import send_mail
 
 def post_share(request, post_id):
     # retrieve post by id
@@ -12,7 +13,8 @@ def post_share(request, post_id):
         id=post_id,
         status=Post.Status.PUBLISHED
     )
-
+    print(f"Request_type: {request.method}")
+    sent = False
     if request.method == 'POST':
         # form was submitted
         form = EmailPostForm(request.POST)
@@ -20,17 +22,39 @@ def post_share(request, post_id):
         if form.is_valid():
             # form fields passed validation
             cd = form.cleaned_data
+            post_url = request.build_absolute_uri(
+                post.get_absolute_url()
+            )
             # .. send email
-        else:
-            print(f"Form Errors: {form.errors}")
-            form = EmailPostForm()
+            subject = (
+                f"{cd['name']} ({cd['email']})"
+                f"recommends you read {post.title}"
+            )
+            
+            message = (
+                f"Read {post.title} at {post_url}\n\n"
+                f"{cd['name']}\'s comments: {cd['comments']}"
+            )
 
-        context = {
-            'post': post,
-            'form': form
-        }
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=None,
+                recipient_list=[cd['to']]
+            )
+            sent = True
+    else:
+        # print(f"Form Errors: {form.errors}")
+        print(f"At email creation")
+        form = EmailPostForm()
 
-        return render(request, 'blog/post/share.html', context)
+    context = {
+        'post': post,
+        'form': form,
+        'sent': sent
+    }
+
+    return render(request, 'blog/post/share.html', context)
     
 class PostListView(ListView):
     ''' alternative post list view '''
