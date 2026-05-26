@@ -6,6 +6,7 @@ from .models import Post
 from .forms import EmailPostForm, CommentForm
 from django.core.mail import send_mail
 from django.views.decorators.http import require_POST
+from taggit.models import Tag
 
 
 def post_share(request, post_id):
@@ -65,8 +66,13 @@ class PostListView(ListView):
     paginate_by = 3
     template_name = 'blog/post/list.html'
 
-def post_list(request):
+def post_list(request, tag_slug=None):
     post_list = Post.published.all()
+    tag = None
+
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        post_list = post_list.filter(tags__in=[tag])
 
     # pagination w/3 posts per page
     paginator = Paginator(post_list, 3)
@@ -82,6 +88,7 @@ def post_list(request):
 
     context = {
         'posts':posts,
+        'tag': tag,
     }
 
     return render(request, 'blog/post/list.html', context)

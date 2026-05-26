@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.urls import reverse
+from taggit.managers import TaggableManager
 
 class PublishedManager(models.Manager):
     def get_queryset(self):
@@ -32,6 +33,7 @@ class Post(models.Model):
 
     objects = models.Manager() # The default manager
     published = PublishedManager() # Our custom manager
+    tags = TaggableManager() # Tags manager
     
     class Meta:
         # ordering
@@ -51,6 +53,7 @@ class Post(models.Model):
                              self.publish.month,
                              self.publish.day,
                              self.slug])
+    
     
 class FavouritePost(models.Model):
     pk = models.CompositePrimaryKey(
@@ -88,3 +91,4 @@ class Comment(models.Model):
     
     def __str__(self):
         return f"Comment by {self.name} on {self.post}"
+    
